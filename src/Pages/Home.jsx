@@ -5,30 +5,34 @@ import PizzaBlock from "../components/PizzaBlock";
 import Skeleton from "../components/PizzaBlock/Skeleton";
 import { useEffect } from "react";
 
-const Home = () => {
+const Home = ({searchValue}) => {
   const [pizzaData, setPizzaData] = React.useState([]);
+  const [isLoading, setIsLoading] = React.useState(true);
   const nine = [1, 2, 3, 4, 5, 6, 7, 8, 9];
   const [categoryId, setCategoryId] = React.useState(0);
-  const [sortType, setSortType] = React.useState(0);
+  const [sortType, setSortType] = React.useState({
+    name: 'популярности',
+    sortProperty: 'rating'
+  });
 
   useEffect(() => {
     debugger
-    let categoryIdQueryParam = '';
-    if(categoryId > 0) {
-        categoryIdQueryParam = categoryId;
-    }
+    let category = categoryId > 0 ? categoryId : '';
+    let search = searchValue ? searchValue : '';
     debugger
-    fetch("https://63de507d9fa0d60060fc8e1c.mockapi.io/items?category=" + categoryIdQueryParam)
+    setIsLoading(true);
+    fetch(`https://63de507d9fa0d60060fc8e1c.mockapi.io/items?category=${category}&sortBy=${sortType.sortProperty}&order=desc&search=${search}`)
     .then((res) => {
       return res.json();
     }).then(json => {
       debugger
-      if(!pizzaData.length) {
+      if(Array.isArray(json) && json.length > 0) {
         setPizzaData(json);
+        setIsLoading(false);
       }
     });
     window.scrollTo(0,0);
-  }, [categoryId])
+  }, [categoryId, sortType, searchValue]);
 
   return (
     <div className="container">
@@ -39,16 +43,20 @@ const Home = () => {
 
       <h2 className="content__title">Все пиццы</h2>
       <div className="content__items">
-        {pizzaData.length > 0
-          ? pizzaData.map((obj) => (
+        {!isLoading
+          ? pizzaData
+          .filter(obj => {
+            return obj .title?.toLowerCase().includes(searchValue?.toLowerCase());
+          })
+          .map((obj) => (
               <PizzaBlock
                 {...obj}
                 key={obj.id}
                 title={obj.title}
                 price={obj.price}
                 imageUrl={obj.imageUrl}
-                sizes={obj.sizes}
-                types={obj.types}
+                sizes={obj.sizes || []}
+                types={obj.types || []}
               />
             ))
           : nine.map((elem, index) => <Skeleton key={index}/>)}
