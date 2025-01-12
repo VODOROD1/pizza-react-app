@@ -1,14 +1,12 @@
-import { useState } from "react";
-import Header from "./components/Header";
-import Categories from "./components/Categories";
-import Sort from "./components/Sort";
-import PizzaBlock from "./components/PizzaBlock";
+import { Routes, Route } from "react-router-dom";
+import Home from "./Pages/Home";
+import Header from "./components/PizzaBlock/Header";
+import Cart from "./Pages/Cart";
+import NotFound from "./components/NotFoundBlock/index";
 import "./App.scss";
 import "./scss/_variables.scss";
-import pizzaData from "./assets/pizzas.json";
 
 function App() {
-  const [count, setCount] = useState(0);
 
   return (
     <>
@@ -16,29 +14,11 @@ function App() {
         <div className="wrapper">
           <Header />
           <div className="content">
-            <div className="container">
-              <div className="content__top">
-                <Categories />
-                <Sort />
-              </div>
-              <h2 className="content__title">Все пиццы</h2>
-              <div className="content__items">
-                {
-                  pizzaData.map((obj) => (
-                    <PizzaBlock
-                      {...obj}
-                      // key={obj.id}
-                      // title={obj.title}
-                      // price={obj.price}
-                      // imageUrl={obj.imageUrl}
-                      // sizes={obj.sizes}
-                      // types={obj.types}
-                    />
-                  ))
-                }
-                {/* <PizzaBlock title="Маргарита" price="10" /> */}
-              </div>
-            </div>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/cart" element={<Cart />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
           </div>
         </div>
       </div>
